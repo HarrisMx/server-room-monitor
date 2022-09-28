@@ -1,0 +1,10 @@
+div .MuiPaper-root {
+    /* border: none;
+    box-shadow: none; */
+}
+
+.MuiTextField-root{
+    width: 100% !important;
+}
+
+
