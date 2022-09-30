@@ -25,7 +25,7 @@ import { Alert } from '@mui/material';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import {useDispatch, useSelector} from 'react-redux';
-import {updateData, setCurrentData, setGraphValues} from '../../../redux/dataSlice';
+import {updateData, setCurrentData, setGraphValues, setUser} from '../../../redux/dataSlice';
 import FirebaseApp from '../../../Functions/GoogleConfig';
 import {getDatabase, ref, child, get} from 'firebase/database';
 
@@ -104,9 +104,16 @@ export default function Header() {
   const data = useSelector((state) => state.data.data);
   const [open, setOpen] = React.useState(false);
 
+  //dispatch(setUser(null));
+
   const handleDrawerOpen = () => {
     setOpen(true);
   };
+
+
+  const logoutUser = () => {
+    dispatch(setUser(null));
+  }
 
   const handleDrawerClose = () => {
     setOpen(false);
@@ -124,8 +131,8 @@ export default function Header() {
 
     Object.keys(sourceObj.value).map((key, index) => {
       let tempObj = {
-        'time_stamp': _time[index],
-        'value': sourceObj.value[key]
+        'x': _time[index],
+        'y': sourceObj.value[key]
       }
 
       newObject.push(tempObj);
@@ -133,25 +140,59 @@ export default function Header() {
 
     dispatch(setGraphValues(newObject));
 
-    console.log('newObject', newObject);
+    //console.log('newObject', newObject);
   }
 
-    const doSomething = (endPoint) => {
+    const doSomething = async(endPoint) => {
+
+
+      switch (endPoint) {
+        case 'fire_value':
+          dispatch(setCurrentData('Fire'));
+          break;
+        case 'Humidity':
+          dispatch(setCurrentData('Humidity'));
+          break;
+        case 'Temperature':
+          dispatch(setCurrentData('Temperature'));
+          break;
+        case 'Current':
+          dispatch(setCurrentData('Current'));
+          break;
+        default: 
+          break;
+    }
+      
       const dbRef = ref(getDatabase());
-      get(child(dbRef, `Sensors/${endPoint}`)).then((snapshot) => {
+      await get(child(dbRef, `Sensors/${endPoint}`)).then((snapshot) => {
         if (snapshot.exists()) {
           dispatch(updateData(snapshot.val()));
-          console.log('data', data)
+          //console.log('data', data)
           constructObject(data);
         } else {
           console.log("No data available");
         }
       }).catch((error) => {
-        console.error(error);
+        console.error("Throwing error", error);
       });
 
       <Alert severity="success">This is a success alert — check it out!</Alert>
     }
+
+    React.useEffect(() => {
+       /*  const dbRef = ref(getDatabase());
+        console.log("Getting data");
+        get(child(dbRef, `Sensors/fire_value`)).then((snapshot) => {
+          if (snapshot.exists()) {
+            dispatch(updateData(snapshot.val()));
+            constructObject(data);
+          } else {
+            console.log("No data available");
+          }
+        }).catch((error) => {
+          console.error(error);
+        }); */
+    }, []);
 
     return (
       <Box sx={{ display: 'flex' }}>
@@ -171,7 +212,7 @@ export default function Header() {
               Dashboard
             </Typography>
             <Button color="inherit">
-              <LogoutIcon/>
+              <LogoutIcon onClick={logoutUser}/>
             </Button>
           </Toolbar>
         </AppBar>

@@ -3,7 +3,8 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
     data: null,
     currenData: null,
-    graphValues: null
+    graphValues: null,
+    user: null
 }
 
 export const dataSlice = createSlice({
@@ -18,9 +19,12 @@ export const dataSlice = createSlice({
         },
         setGraphValues: (state, action) => {
             state.graphValues = action.payload
+        },
+        setUser : (state, action) => {
+            state.user = action.payload
         }
     }
 })
 
-export const {updateData, setCurrentData, setGraphValues} = dataSlice.actions;
+export const {updateData, setCurrentData, setGraphValues, setUser} = dataSlice.actions;
 export default dataSlice.reducer;
